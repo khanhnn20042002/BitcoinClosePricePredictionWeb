@@ -1,0 +1,56 @@
+index.html
+
+<form action='' method="post" class="ui form">
+    {% csrf_token %}
+    <div class="field">
+        <div class="two fields">
+            <div class="field">
+            <label>Date from:</label>
+            <input type="date" name="date-from">
+            </div>
+            <div class="field">
+            <label>Date to:</label>
+            <input type="date" name="date-to">
+            </div>
+        </div>
+    </div>
+    <div class="block-center">
+        <button class="ui primary button" type="submit">Submit</button>
+    </div>
+</form>
+
+views.py
+
+# data = load_data(exchange, 'BTC/USD', period)
+# date_from = request.POST["date-from"]
+# date_to = request.POST["date-to"]
+# data['date'] = data['date'].apply(lambda x : x.strftime("%Y-%m-%d"))
+# if date_from != "" and date_to != "":
+#     data = data[(data["date"] >= date_from) & (data["date"] <= date_to)]
+# fig = px.line(data, x = 'date', y = 'close')
+# line_plot = plot(fig, output_type="div")
+# context = {'plot_div': line_plot}
+# return render(request, 'bitcoin_app/index.html', context)
+
+<div class="ui selection dropdown">
+    <input type="hidden" name="algorithm">
+    <i class="dropdown icon"></i>
+    <div class="default text">----</div>
+    <div class="menu">
+        <div class="item" data-value="lstm">Long short term memory</div>
+        <div class="item" data-value="xgb-reg">Gradient Boosting</div>
+    </div>
+</div>
+
+utils.py
+
+def load_data(exchange, pair, period):
+    data = exchange.fetchOHLCV(pair, period)
+    df = pd.DataFrame(data, columns = ['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+    df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms', utc=True).dt.tz_convert(settings.TIME_ZONE)
+    df['time'] = df['timestamp'].dt.time
+    df['date'] = df['timestamp'].dt.date
+    column_names = ['date', 'time', 'open', 'high', 'low', 'close', 'volume']
+    df.drop('timestamp', axis = 1, inplace=True)
+    df = df.reindex(columns=column_names)
+    return df

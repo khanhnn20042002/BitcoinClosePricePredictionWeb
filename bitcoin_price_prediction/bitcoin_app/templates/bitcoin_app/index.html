@@ -1,0 +1,27 @@
+{% extends 'bitcoin_app/base.html' %}
+
+{% block title %} Bitcoin {% endblock title %}
+
+{% block content %}
+    <h1>Bitcoin Close Price Prediction</h1>
+    {{ plot_div|safe }}
+    
+    <form action='' method="post">
+      {% csrf_token %}
+      <span><b> Get previous </b></span> <input class="integer-input" type="number" step="1" name="limit" value="{{ limit }}"> <span><b> days close price</b></span>
+      <br>
+      <span><b>Predict close price next</b></span> <input class="integer-input" type="number" step="1" name="future-days" value="{{ future_days }}"> <span><b>days</b></span>
+      <br>
+      <span><b>Choose an algorithm:&nbsp;</b></span>
+      <select name="algorithm">
+        <option value="lstm">Long short term memory</option>
+        {% if algorithm == 'xgb-reg' %}
+          <option value="xgb-reg" selected>Gradient Boosting</option>
+        {% else %}
+          <option value="xgb-reg">Gradient Boosting</option>
+        {% endif %}
+      </select>
+      <br>
+      <button class="ui primary button mtop" type="submit">Submit</button>
+    </form>
+{% endblock content %}
